@@ -1,0 +1,265 @@
+%第一题
+[f1,map]= imread('citywall.bmp');i1=ind2gray(f1,map);
+[f2,map1]= imread('citywall1.bmp');i2=ind2gray(f2,map1);
+[f3,map3]= imread('citywall2.bmp');i3=ind2gray(f3,map3);
+[f4,map4]= imread('elain.bmp');i4=ind2gray(f4,map4);
+figure(1)
+subplot(221),imhist(i1),title('citywall');
+subplot(222),imhist(i2),title('citywall1');
+subplot(223),imhist(i3),title('citywall2');
+subplot(224),imhist(i4),title('elain');
+
+[f5,map5]= imread('elain1.bmp');i5=ind2gray(f5,map5);
+[f6,map6]= imread('elain2.bmp');i6=ind2gray(f6,map6);
+[f7,map7]= imread('elain3.bmp');i7=ind2gray(f7,map7);
+[f8,map8]= imread('lena.bmp');i8=ind2gray(f8,map8);
+figure(2)
+subplot(221),imhist(i5),title('elain1');
+subplot(222),imhist(i6),title('elain2');
+subplot(223),imhist(i7),title('elain3');
+subplot(224),imhist(i8),title('lena')
+
+[f9,map9]= imread('lena1.bmp'); i9=ind2gray(f9,map9);
+[f10,map10]= imread('lena2.bmp');i10=ind2gray(f10,map10);
+[f11,map11]=imread('lena4.bmp');i11=ind2gray(f11,map11);
+[f12,map12]= imread('woman.bmp'); i12=ind2gray(f12,map12);
+figure(3)
+subplot(221),imhist(i9),title('lean1');
+subplot(222),imhist(i10),title('lena2');
+subplot(223),imhist(i11),title('lena4');
+subplot(224),imhist(i12),title('woman');
+
+[f13,map13]=imread('woman1.bmp');i13=ind2gray(f13,map13);
+[f14,map14]=imread('woman2.bmp');i14= ind2gray(f14,map14);
+figure(4)
+subplot(221),imhist(i13),title('women1');
+subplot(222),imhist(i14),title('women2');
+
+%第二题
+g1=histeq(i1,256);
+g2=histeq(i2,256);
+figure(1)
+subplot(221),imshow(i1),title('citywall原图像');
+subplot(222),imshow(g1),title('均衡后');
+subplot(223),imshow(i2),title('citywall1原图像');
+subplot(224),imshow(g2),title('均衡后');
+
+g3=histeq(i3,256);
+g4=histeq(i4,256);
+figure(2)
+subplot(221),imshow(i3),title('citywall2原图像');
+subplot(222),imshow(g3),title('均衡后');
+subplot(223),imshow(i4),title('elain原图像');
+subplot(224),imshow(g4),title('均衡后');
+
+g5=histeq(i5,256);
+g6=histeq(i6,256);
+figure(3)
+subplot(221),imshow(i5),title('elain1原图像');
+subplot(222),imshow(g5),title('均衡后');
+subplot(223),imshow(i6),title('elain2原图像');
+subplot(224),imshow(g6),title('均衡后');
+
+g7=histeq(i7,256);
+g8=histeq(i8,256);
+figure(4)
+subplot(221),imshow(i7),title('elain3原图像');
+subplot(222),imshow(g7),title('均衡后');
+subplot(223),imshow(i8),title('lena原图像');
+subplot(224),imshow(g8),title('均衡后');
+
+g9 =histeq(i9,256);
+g10=histeq(i10,256);
+figure(5)
+subplot(221),imshow(i9),title('lena1原图像');
+subplot(222),imshow(g9),title('均衡后');
+subplot(223),imshow(i10),title('lena2原图像');
+subplot(224),imshow(g10),title('均衡后');
+
+g11=histeq(i11,256);
+g12=histeq(i12,256);
+figure(6)
+subplot(221),imshow(i11),title('lena4原图像');
+subplot(222),imshow(g11),title('均衡后');
+subplot(223),imshow(i12),title('woman原图像');
+subplot(224),imshow(g12),title('均衡后');
+
+g13=histeq(i13,256);
+g14=histeq(i14,256);
+figure(7)
+subplot(221),imshow(i13),title('woman1原图像');
+subplot(222),imshow(g13),title('均衡后');
+subplot(223),imshow(i14),title('woman2原图像');
+subplot(224),imshow(g14),title('均衡后');
+
+%第三题
+%histmatching函数
+function [image_out, T3] = histmatching(image_in, hist)
+Level = 256;
+[m, n] = size(image_in);
+image_hist = imhist(image_in);
+image_out = image_in;
+% 求解T1
+ac1 = zeros(Level, 1);
+T1 = zeros(Level, 1, 'uint8');
+ac1(1) = image_hist(1);
+for i = 2 : Level
+ac1(i) = ac1(i - 1) + image_hist(i);
+end
+ac1 = ac1 * (Level - 1);
+for i = 1 : 256
+    T1(i) = uint8(round((ac1(i)) / (m * n)));
+end
+% 求解T2
+ac2 = zeros(Level, 1);
+T2 = zeros(Level, 1, 'uint8');
+ac2(1) = hist(1);
+for i = 2 : Level
+    ac2(i) = ac2(i - 1) + hist(i);
+end
+ac2 = ac2 * (Level - 1);
+hist_sum = sum(hist);
+for i = 1 : 256
+    T2(i) = uint8(round((ac2(i)) / hist_sum));
+end
+% 求解T3
+temp = zeros(Level, 1, 'uint8');
+T3 = T1;
+for i = 1 : 256
+    for j = 1 : 256
+        temp(j) = abs(T1(i) - T2(j));
+    end
+    [~, B] = min(temp);
+    T3(i) = B - 1;
+end
+for i = 1 : m
+    for j = 1 : n
+        image_out(i, j) = T3(uint32(image_in(i, j)) + 1);
+    end
+end
+end
+%主函数
+j1=imhist(i1);
+j2=imhist(i4);
+j3=imhist(i8);
+j4=imhist(i12);
+
+[match2,Q2]=histmatching(i2,j1);
+figure(1)
+subplot(121),imshow(i1);title('citywall模板图像')
+subplot(122),imhist(i1),title('模板图像直方图')
+figure(2)
+subplot(221),imshow(i2),title('citywall1');
+subplot(222),imshow(match2),title('直方图匹配后')
+subplot(223),imhist(i2);
+subplot(224),imhist(match2);
+
+[match3,Q3]=histmatching(i3,j1);
+figure(3)
+subplot(221),imshow(i3),title('citywall2');
+subplot(222),imshow(match3),title('直方图匹配后')
+subplot(223),imhist(i3);
+subplot(224),imhist(match3);
+
+%elain的直方图匹配
+%j4=imhist(i4);
+figure(4)
+subplot(121),imshow(i4);title('elain模板图像')
+subplot(122),imhist(i4),title('模板图像直方图')
+
+[match5,Q5]=histmatching(i5,j2);
+figure(5)
+subplot(221),imshow(i5),title('elain1');
+subplot(222),imshow(match5),title('直方图匹配后')
+subplot(223),imhist(i5);
+subplot(224),imhist(match5);
+
+[match6,Q6]=histmatching(i6,j2);
+figure(6)
+subplot(221),imshow(i6),title('elain2');
+subplot(222),imshow(match6),title('直方图匹配后')
+subplot(223),imhist(i6);
+subplot(224),imhist(match6);
+
+[match7,Q7]=histmatching(i7,j2);
+figure(7)
+subplot(221),imshow(i7),title('elain3');
+subplot(222),imshow(match7),title('直方图匹配后')
+subplot(223),imhist(i7);
+subplot(224),imhist(match7);
+
+
+figure(8)
+subplot(121),imshow(i8);title('lena模板图像')
+subplot(122),imhist(i8),title('模板图像直方图')
+
+[match9,Q9]=histmatching(i9,j3);
+figure(9)
+subplot(221),imshow(i9),title('lena1');
+subplot(222),imshow(match9),title('直方图匹配后')
+subplot(223),imhist(i9);
+subplot(224),imhist(match9);
+
+[match10,Q10]=histmatching(i10,j3);
+figure(10)
+subplot(221),imshow(i10),title('lena2');
+subplot(222),imshow(match10),title('直方图匹配后')
+subplot(223),imhist(i10);
+subplot(224),imhist(match10);
+
+[match11,Q11]=histmatching(i11,j3);
+figure(11)
+subplot(221),imshow(i11),title('lena3');
+subplot(222),imshow(match11),title('直方图匹配后')
+subplot(223),imhist(i11);
+subplot(224),imhist(match11);
+
+figure(12)
+subplot(121),imshow(i12);title('woman模板图像')
+subplot(122),imhist(i12),title('模板图像直方图')
+
+[match13,Q13]=histmatching(i13,j4);
+figure(13)
+subplot(221),imshow(i13),title('woman1');
+subplot(222),imshow(match13),title('直方图匹配后')
+subplot(223),imhist(i13);
+subplot(224),imhist(match13);
+
+[match14,Q14]=histmatching(i14,j4);
+figure(14)
+subplot(221),imshow(i14),title('woman2');
+subplot(222),imshow(match14),title('直方图匹配后')
+subplot(223),imhist(i14);
+subplot(224),imhist(match14);
+
+%第四题
+jubu1=adapthisteq(i4,'Numtiles',[7,7]);
+figure(1)
+imshow(jubu1);
+jubu2=adapthisteq(i8,'Numtiles',[7,7]);
+figure(2)
+imshow(jubu2)
+
+%第五题
+[img1,map1]=imread('elain.bmp');
+p1=ind2gray(img1,map1);
+[img2,map2]=imread('woman.Bmp');
+p2=ind2gray(img2,map2);
+figure;
+subplot(1,2,1);
+imshow(p1);
+title('elain原始图像');
+level1=graythresh(p1);
+pt1=im2bw(p1,level1);
+subplot(1,2,2);
+imshow(pt1);
+title('分割后图像');
+figure;
+subplot(1,2,1);
+imshow(p2);
+title('woman原始图像');
+level2=graythresh(p2);
+pt2=im2bw(p2,level2);
+subplot(1,2,2);
+imshow(pt2);
+title('分割后图像');
